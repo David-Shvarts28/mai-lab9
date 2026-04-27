@@ -1,20 +1,32 @@
-from src.power import power_function
-from src.constants import SAMPLE_CONSTANT
+import asyncio
+
+from src.async_executor import AsyncTaskExe
+from src.handlers import EchoTaskHandler, FailingTaskHandler, SleepTaskHandler
+from src.task import Task
+from src.task_queue import TaskQueue
 
 
 def main() -> None:
-    """
-    Обязательнная составляющая программ, которые сдаются. Является точкой входа в приложение
-    :return: Данная функция ничего не возвращает
-    """
+    """Точка входа в приложение."""
+    async def run() -> None:
+        queue = TaskQueue(
+            [
+                Task(id="T-1", description="гусь echo-задача", priority=8, status="new", payload={"kind": "echo", "message": "hello"}),
+                Task(id="T-2", description="гусь спит-задача", priority=5, status="new", payload={"kind": "sleep", "seconds": 0.01}),
+                Task(id="T-3", description="гусиная неверная задача", priority=6, status="new", payload={"kind": "fail"}),
+            ]
+        )
 
-    target, degree = map(int, input("Введите два числа разделенные пробелом: ").split(" "))
+        executor = AsyncTaskExe()
+        executor.add_handler(EchoTaskHandler())
+        executor.add_handler(SleepTaskHandler())
+        executor.add_handler(FailingTaskHandler())
 
-    result = power_function(target=target, power=degree)
+        await executor.enqueue_from_task_queue(queue)
+        await executor.run()
 
-    print(result)
+    asyncio.run(run())
 
-    print(SAMPLE_CONSTANT)
 
 if __name__ == "__main__":
     main()
