@@ -72,7 +72,7 @@ class AsyncTaskExe:
             handler = self._pick_handler(task)
             if handler is None:
                 task.finish(success=False)
-                self._errors.append(f"Для задачи {task.id} не найден обработчик")
+                self._errors.append(f"Не найден обработчик для задачи {task.id}")
                 return
             await handler.handle(task)
             task.finish(success=True)
