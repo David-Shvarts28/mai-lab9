@@ -25,6 +25,14 @@ def main() -> None:
         await executor.enqueue_from_task_queue(queue)
         await executor.run()
 
+        print("Логи:")
+        for line in executor.logs:
+            print(f"- {line}")
+
+        print("Ошибки:")
+        for line in executor.errors:
+            print(f"- {line}")
+
     asyncio.run(run())
 
 
